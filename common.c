@@ -70,3 +70,56 @@ void printf(const char *fmt, ...){
 end:
     va_end(args);
 }
+
+void *memset(void *buf, char c, size_t n){
+    uint8_t *p = (uint8_t *)buf;
+
+    while(n > 0){
+        *p = c;
+        p++;
+        n--;
+    }
+
+    return buf;
+}
+
+void *memcpy(void *dst, void *src, size_t n){
+    uint8_t *d = (uint8_t *)dst;
+    const uint8_t *s = (const uint8_t *)src;
+
+    for(int i = 0; i < n; i++){
+        d[i] = s[i];
+    }
+
+    return dst;
+}
+
+char *strncpy(char *dst, const char *src, size_t n){
+    size_t i = 0;
+
+    while(src[i] != '\0' && i < n){
+        dst[i] = src[i];
+        i++;
+    }
+
+    while(i < n){
+        dst[i] = '\0';
+        i++;
+    }
+
+    return dst;
+}
+
+int strcmp(const char *s1, const char *s2){
+    while(*s1 && *s2){
+
+        if(*s1 != *s2){
+            break;
+        }
+
+        s1++;
+        s2++;
+    }
+
+    return *(unsigned char *)s1 - *(unsigned char *)s2;
+}
