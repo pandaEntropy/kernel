@@ -31,7 +31,6 @@ void kernel_main(){
     memset(__bss, 0, (size_t) __bss_end - (size_t) __bss);
 
     printf("\n\nhello world!\n");
-    printf("peak kernel\n");
 
     for(;;){
         __asm__ __volatile__("wfi");
