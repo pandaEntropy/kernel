@@ -2,7 +2,7 @@
 #include "common.h"
 
 // Referencing the labels from the linker script
-extern char __bss[], __bss_end[], __stack_top[];
+extern char __bss[], __bss_end[], __stack_top[], __free_ram[], __free_ram_end[];
 
 //long ensures that a variable matches the target cpu's word size
 struct sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4, long arg5, long fid, long eid){
@@ -113,16 +113,29 @@ void handle_trap(struct trap_frame *tf){
     PANIC("unexpected trap scause=%x, stval=%x, sepc=%x\n", scause, stval, sepc);
 }
 
+// NOTE: Can not be freed
+paddr_t alloc_pages(uint32_t n){
+    //This will onyl execute once since this is a static var and retains value accross calls
+    static paddr_t next_paddr = (paddr_t) __free_ram;
+
+    paddr_t paddr = next_paddr;
+    next_paddr += n * PAGE_SIZE;
+
+    if(next_paddr > (paddr_t) __free_ram_end){
+        PANIC("out of memory");
+    }
+
+    memset((void *) paddr, 0, n * PAGE_SIZE);
+    return paddr;
+}
+
 void kernel_main(){
     memset(__bss, 0, (size_t) __bss_end - (size_t) __bss);
 
     //Load the address of the entry function to the stvec register
     WRITE_CSR(stvec, (uint32_t) kernel_entry);
-    __asm__ __volatile__("unimp");
 
-    for(;;){
-        __asm__ __volatile__("wfi");
-    }
+    PANIC("booted");
 }
 
 __attribute__((section(".text.boot"))) //place the boot function at .text.boot
