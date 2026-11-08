@@ -2,6 +2,17 @@
 
 #include "common.h"
 
+#define PROC_MAX 8
+#define PROC_UNUSED 0
+#define PROC_RUNNABLE 1
+
+struct process{
+    int pid;
+    int state;
+    uint8_t stack[8192];
+    vaddr_t sp;
+};
+
 #define PANIC(fmt, ...) \
     do{ \
         printf("PANIC: %s:%d: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
